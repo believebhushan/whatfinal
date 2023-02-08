@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+</head>
+
+<body>
+
+    <div id="app" class="container">
+        <h4 class="text-center py-3">Offer Bulk Messaging Services </h1>
+            <div class="row">
+                <div class="col-sm-6">
+                    <p class="small">Reload the page if Qr is not visbile </p>
+                    <img src="" alt="QR Code" id="qrcode">
+                </div>
+                <div class="col-sm-6">
+                     <span id="ref"></span>
+                    <h5>Logs:</h3>
+                        <ul class="logs"></ul>
+                </div>
+            </div>
+    </div>
+
+    <div>
+        <label for="numbers">Numbers:</label>
+        <textarea id="numbers" name="numbers" rows="5" cols="30" placeholder="comma seperated with country  code  and without 0 and + sign e.g 917321965118,919431426600"></textarea>
+      </div>
+      <div>
+        <label for="message">Message:</label>
+        <textarea id="message" name="message" rows="5" cols="30" placeholder="type your message here"></textarea>
+      </div>
+    <button onclick="getValues()">Send Message</button>
+  
+    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.2/axios.min.js"></script>
+
+    <script>
+    
+    const url = window.location.href;
+    const lastSegment = url.split("/").pop();
+            var socket = io();
+
+    function getValues(){
+                var numbers=document.getElementById("numbers")
+                var message=document.getElementById("message")
+                var all=numbers.value.split(',')
+                const payload={to:all,message:message.value,number:'1234',type:'chat'}
+                socket.emit("sendBulk",payload)
+    }
+            
+            
+            
+            socket.emit('StartConnection',lastSegment);
+            socket.on('message', function (msg) {
+
+                $('.logs').append($('<li>').text(msg));
+            });
+
+            socket.on('qr', function (src) {
+                $('#qrcode').attr('src', src);
+                $('#qrcode').show();
+            });
+
+            socket.on('ready', function (data) {
+                $('#logout').attr('href', '/logout/' + data);
+                $("#ref").html('<button class="btn btn-danger mb-3" id="logout" onclick="logout('+data+')">Logout</button>');
+                $('#qrcode').hide();
+            });
+        
+           function logout(device){
+            socket.emit('LogoutDevice',device)
+            }        
+    </script>
+
+
+</body>
+
+</html>
