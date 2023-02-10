@@ -50,7 +50,8 @@
                 var numbers=document.getElementById("numbers")
                 var message=document.getElementById("message")
                 var all=numbers.value.split(',')
-                const payload={to:all,message:message.value,number:'1234',type:'chat'}
+                const deviceId=window.location.href.split('/')[4]
+                const payload={to:all,message:message.value,number:deviceId,type:'chat'}
                 socket.emit("sendBulk",payload)
     }
             
