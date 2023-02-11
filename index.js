@@ -13,6 +13,8 @@ const port = 9000;
 const fs = require("fs");
 const qrcode = require("qrcode");
 const pino = require("pino");
+const cors=require('cors')
+
 const socketIO = require("socket.io");
 const url=process.env.url
 
@@ -36,6 +38,7 @@ let x;
 const path = "./core/";
 
 const { body, validationResult } = require("express-validator");
+app.use(cors())
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -61,6 +64,7 @@ io.on("connection", (socket) => {
 
         if (qr) {
           qrcode.toDataURL(qr, (err, url) => {
+            console.log(qr,url,"bhbhv")
             socket.emit("qr", url);
             socket.emit("message", "QR Code received, scan please!");
           });
