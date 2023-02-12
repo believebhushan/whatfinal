@@ -1,8 +1,8 @@
 const {createClient} =require('@supabase/supabase-js')
 const supabaseUrl =  process.env.supabaseUrl;
 const supabaseAnonKey = process.env.supabaseAnonKey;
-const supabase = createClient(supabaseUrl, supabaseAnonKey)
 const checkIsAllowed=async(apiKey)=>{
+    const supabase = createClient(supabaseUrl, supabaseAnonKey)
     if(!apiKey){
         return false
     }
