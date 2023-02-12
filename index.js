@@ -154,10 +154,10 @@ app.post(
     body("type").notEmpty(),
   ],
   async (req, res) => {
-    const isAuthorised= await checkIsAllowed(req.body.authkey);
-    if(!isAuthorised){
-      res.status(401).send({message:'unauthrorised'})
-    }
+    // const isAuthorised= await checkIsAllowed(req.body.authkey);
+    // if(!isAuthorised){
+    //   res.status(401).send({message:'unauthrorised'})
+    // }
     const errors = validationResult(req).formatWith(({ msg }) => {
       return msg;
     });
