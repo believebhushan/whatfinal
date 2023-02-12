@@ -15,6 +15,7 @@
     "@adiwajshing/baileys": "^4.3.0",
     "@adiwajshing/eslint-config": "git+https://github.com/adiwajshing/eslint-config",
     "@adiwajshing/keyed-db": "^0.2.4",
+    "@supabase/supabase-js": "^2.7.1",
     "axios": "^0.27.2",
     "body-parser": "^1.20.0",
     "cors": "^2.8.5",

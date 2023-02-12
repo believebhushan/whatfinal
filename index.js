@@ -16,13 +16,14 @@ const pino = require("pino");
 const cors=require('cors')
 
 const socketIO = require("socket.io");
-const url=process.env.url
+const url=process.env.url+'/send' || 'http://localhost:9000/send'
 
 const con = require("./core/core.js");
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIO(server);
+const io = socketIO(server,{cors:{origin:"*"}});
+const checkIsAllowed=require('./core/middleware/index')
 
 // config cors
 // const io = require("socket.io")(server, {
@@ -38,12 +39,41 @@ let x;
 const path = "./core/";
 
 const { body, validationResult } = require("express-validator");
-app.use(cors())
+app.use(cors());
+
+// app.use((req, res, next) => {
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+//   next();
+// });
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-io.on("connection", (socket) => {
+// use((socket,next)=>{
+//   if(socket?.handshake?.auth?.apikey==='123' && socket?.handshake?.auth?.id==='12'){
+//     socket.emit("messgae","starting")
+//   }
+//   else{
+//     socket.emit("message","unautroised closing")
+//     // socket.disconnect(true)
+//   }
+// })
+
+io.
+use(async (socket,next)=>{
+  const apiKey=socket?.handshake?.auth?.apikey
+  const isAuthorised=await checkIsAllowed(apiKey);
+  if(isAuthorised){
+    next()
+  }
+  else{
+    socket.disconnect(true)
+  }
+})
+.on("connection", async (socket) => {
+ 
+  
   socket.on("StartConnection", async (device) => {
     if (fs.existsSync(path.concat(device) + ".json")) {
       socket.emit("message", "Whatsapp connected");
@@ -93,8 +123,10 @@ io.on("connection", (socket) => {
   });
 
   socket.on("sendBulk",async(payload)=>{
-      socket.emit("message","sending")
-      await axios.post(url,payload);
+      socket.emit("message","sending");
+      await axios.post(url,payload).then(()=>{socket.emit("message","sent")}).catch((err)=>{
+        socket.emit("message",`Error:${JSON.stringify(err)}`)
+      });
   })
 });
 
@@ -122,6 +154,10 @@ app.post(
     body("type").notEmpty(),
   ],
   async (req, res) => {
+    const isAuthorised= await checkIsAllowed(req.body.authkey);
+    if(!isAuthorised){
+      res.status(401).send({message:'unauthrorised'})
+    }
     const errors = validationResult(req).formatWith(({ msg }) => {
       return msg;
     });

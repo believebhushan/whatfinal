@@ -42,26 +42,29 @@
 
     <script>
     
-    const url = window.location.href;
-    const lastSegment = url.split("/").pop();
-            var socket = io();
+    const auth_details={id:'7321965118',apikey:'3d760342-eadb-4721-8f03-74e5a90d59cf'} // import the auths or pass from another file dyanamically
+    const url =   process.env.url //remove and make it the server's address
+    var socket = io.connect(url,{
+                auth:auth_details
+            });
 
     function getValues(){
                 var numbers=document.getElementById("numbers")
                 var message=document.getElementById("message")
                 var all=numbers.value.split(',')
-                const deviceId=window.location.href.split('/')[4]
+                const deviceId=auth_details?.id
                 const payload={to:all,message:message.value,number:deviceId,type:'chat'}
                 socket.emit("sendBulk",payload)
     }
             
-            
-            
-            socket.emit('StartConnection',lastSegment);
+            socket.emit('StartConnection', auth_details?.id);
             socket.on('message', function (msg) {
 
                 $('.logs').append($('<li>').text(msg));
             });
+            socket.on('disconnect',()=>{
+                $('.logs').append($('<li>').text('Disconneted check your credentials'));
+            })
 
             socket.on('qr', function (src) {
                 $('#qrcode').attr('src', src);
