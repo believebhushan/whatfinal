@@ -37,6 +37,7 @@ const checkIsAllowed=require('./core/middleware/index')
 let x;
 
 const path = "./core/";
+//decalare an apiu here
 
 const { body, validationResult } = require("express-validator");
 app.use(cors());
@@ -158,6 +159,7 @@ app.post(
     // if(!isAuthorised){
     //   res.status(401).send({message:'unauthrorised'})
     // }
+    console.log("in")
     const errors = validationResult(req).formatWith(({ msg }) => {
       return msg;
     });
