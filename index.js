@@ -83,7 +83,7 @@ use(async (socket,next)=>{
       const { state, saveState } = useSingleFileAuthState(
         path.concat(device) + ".json"
       );
-
+  
       const sock = makeWASocket({
         printQRInTerminal: false,
         auth: state,
@@ -145,6 +145,9 @@ app.get("/device", (req, res) => {
 app.get("/scan/:id", (req, res) => {
   res.sendFile(__dirname + "/core//index.html");
 });
+app.get("/get",(req,res)=>{
+  res.redirect('https://offerplant.com/')
+})
 
 app.post(
   "/send",
